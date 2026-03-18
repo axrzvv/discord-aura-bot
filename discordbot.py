@@ -3,13 +3,12 @@ from discord.ext import commands
 from flask import Flask, request, redirect
 import requests
 import threading
-
 # ===== 設定 =====
 import os
 TOKEN = os.environ.get("TOKEN")
 CLIENT_ID = 1483597829502140656
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-https://discord-aura-bot.onrender.com/callback
+REDIRECT_URI = "https://discord-aura-bot.onrender.com/callback"
 GUILD_ID = 1483503974085558386  # サーバーID
 ROLE_NAME = "Member"
 
