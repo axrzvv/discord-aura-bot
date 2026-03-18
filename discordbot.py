@@ -44,60 +44,60 @@ def login():
 
 @app.route('/callback')
 def callback():
-try:
-    print("🔥 CALLBACK HIT")
+    try:
+        print("🔥 CALLBACK HIT")
 
-    code = request.args.get("code")
-    print("CODE:", code)
+        code = request.args.get("code")
+        print("CODE:", code)
 
-    data = {
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "grant_type": "authorization_code",
-        "code": code,
-        "redirect_uri": REDIRECT_URI
-    }
+        data = {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": REDIRECT_URI
+        }
 
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
 
-    token_res = requests.post(
-        "https://discord.com/api/oauth2/token",
-        data=data,
-        headers=headers
-    )
+        token_res = requests.post(
+            "https://discord.com/api/oauth2/token",
+            data=data,
+            headers=headers
+        )
 
-    print("STATUS:", token_res.status_code)
-    print("BODY:", token_res.text)
+        print("STATUS:", token_res.status_code)
+        print("BODY:", token_res.text)
 
-    token_json = token_res.json()
-    access_token = token_json.get("access_token")
+        token_json = token_res.json()
+        access_token = token_json.get("access_token")
 
-    if not access_token:
-        return "アクセストークン取得失敗"
+        if not access_token:
+            return "アクセストークン取得失敗"
 
-except Exception as e:
-    print("ERROR:", e)
-    return "ERROR"
+        # 👇ここに入れる！！
+        user_res = requests.get(
+            "https://discord.com/api/users/@me",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
 
-# 👇 ここから安全に実行
-user_res = requests.get(
-    "https://discord.com/api/users/@me",
-    headers={"Authorization": f"Bearer {access_token}"}
-)
+        user_json = user_res.json()
+        user_id = int(user_json["id"])
 
-user_json = user_res.json()
-user_id = int(user_json["id"])
+        guild = bot.get_guild(GUILD_ID)
+        member = guild.get_member(user_id)
+        role = discord.utils.get(guild.roles, name=ROLE_NAME)
 
-guild = bot.get_guild(GUILD_ID)
-member = guild.get_member(user_id)
-role = discord.utils.get(guild.roles, name=ROLE_NAME)
+        if member and role:
+            bot.loop.create_task(member.add_roles(role))
 
-if member and role:
-    bot.loop.create_task(member.add_roles(role))
+        return "認証完了！Discordに戻ってください"
 
-return "認証完了！Discordに戻ってください"
+    except Exception as e:
+        print("ERROR:", e)
+        return "ERROR"
 
 # ===== Bot起動 =====
 import threading
