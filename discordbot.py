@@ -52,10 +52,10 @@ def callback():
     token_res = requests.post(
         "https://discord.com/api/oauth2/token",
         data=data,
-        headers=headers
-    )
-    print("STATUS:", token_res.status_code)
-print("BODY:", token_res.text)
+        headers=headers)
+    
+    print("STATUS:", token_res.status_code
+    print("BODY:", token_res.text)
 
     token_json = token_res.json()
     access_token = token_json.get("access_token")
