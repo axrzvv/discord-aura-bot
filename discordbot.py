@@ -8,7 +8,7 @@ import os
 TOKEN = os.environ.get("TOKEN")
 CLIENT_ID = 1483597829502140656
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-REDIRECT_URI = "https://discord-aura-bot-h98b.onrender.com/callback"
+REDIRECT_URI = "https://discord-aura-bot-h9bb.onrender.com/callback"
 GUILD_ID = 1483503974085558386  # サーバーID
 ROLE_NAME = "Member"
 
@@ -54,6 +54,9 @@ def callback():
         data=data,
         headers=headers
     )
+    print("STATUS:", token_res.status_code)
+print("BODY:", token_res.text)
+
     token_json = token_res.json()
     access_token = token_json.get("access_token")
 
