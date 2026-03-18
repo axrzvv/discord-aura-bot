@@ -5,6 +5,7 @@ import requests
 import threading
 
 # ===== 設定 =====
+import os
 TOKEN = os.environ.get("TOKEN")
 CLIENT_ID = 1483597829502140656
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
