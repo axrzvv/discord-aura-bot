@@ -44,61 +44,60 @@ def login():
 
 @app.route('/callback')
 def callback():
-    try:
-        print("🔥 CALLBACK HIT")
+try:
+    print("🔥 CALLBACK HIT")
 
-        code = request.args.get("code")
-        print("CODE:", code)
+    code = request.args.get("code")
+    print("CODE:", code)
 
-        data = {
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": REDIRECT_URI
-        }
+    data = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": REDIRECT_URI
+    }
 
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
 
-        token_res = requests.post(
-            "https://discord.com/api/oauth2/token",
-            data=data,
-            headers=headers
-        )
-
-        print("STATUS:", token_res.status_code)
-        print("BODY:", token_res.text)
-
-        # 👇 ここに入れる！！
-        token_json = token_res.json()
-        access_token = token_json.get("access_token")
-        print("ACCESS TOKEN:", access_token)
-
-        return "OK"
-
-    except Exception as e:
-        print("ERROR:", e)
-        return "ERROR"
-
-    # ユーザー情報取得
-    user_res = requests.get(
-        "https://discord.com/api/users/@me",
-        headers={"Authorization": f"Bearer {access_token}"}
+    token_res = requests.post(
+        "https://discord.com/api/oauth2/token",
+        data=data,
+        headers=headers
     )
-    user_json = user_res.json()
-    user_id = int(user_json["id"])
 
-    # ロール付与
-    guild = bot.get_guild(GUILD_ID)
-    member = guild.get_member(user_id)
-    role = discord.utils.get(guild.roles, name=ROLE_NAME)
+    print("STATUS:", token_res.status_code)
+    print("BODY:", token_res.text)
 
-    if member and role:
-        bot.loop.create_task(member.add_roles(role))
+    token_json = token_res.json()
+    access_token = token_json.get("access_token")
 
-    return "認証完了！Discordお戻りください"
+    if not access_token:
+        return "アクセストークン取得失敗"
+
+except Exception as e:
+    print("ERROR:", e)
+    return "ERROR"
+
+# 👇 ここから安全に実行
+user_res = requests.get(
+    "https://discord.com/api/users/@me",
+    headers={"Authorization": f"Bearer {access_token}"}
+)
+
+user_json = user_res.json()
+user_id = int(user_json["id"])
+
+guild = bot.get_guild(GUILD_ID)
+member = guild.get_member(user_id)
+role = discord.utils.get(guild.roles, name=ROLE_NAME)
+
+if member and role:
+    bot.loop.create_task(member.add_roles(role))
+
+return "認証完了！Discordに戻ってください"
 
 # ===== Bot起動 =====
 import threading
