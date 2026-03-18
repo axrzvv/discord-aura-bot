@@ -79,7 +79,10 @@ def callback():
 import threading
 
 def run_bot():
-    bot.run(TOKEN)
+    try:
+        bot.run(TOKEN)
+    except Exception as e:
+        print("BOT ERROR:", e)
 
 if __name__ == "__main__":
     t = threading.Thread(target=run_bot)
