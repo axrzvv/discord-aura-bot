@@ -8,7 +8,7 @@ import os
 TOKEN = os.environ.get("TOKEN")
 CLIENT_ID = 1483597829502140656
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-REDIRECT_URI = "https://discord-aura-bot-h9bb.onrender.com/callback"
+REDIRECT_URI = "https://discord.com/oauth2/authorize?client_id=1483597829502140656&response_type=code&redirect_uri=https%3A%2F%2Fdiscord-aura-bot-h9b8.onrender.com%2Fcallback&scope=ident"
 GUILD_ID = 1483503974085558386  # サーバーID
 ROLE_NAME = "Member"
 
