@@ -19,9 +19,9 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # ===== Flask設定 =====
-app = Flask(__name__)
-
 import urllib.parse
+
+app = Flask(__name__)
 
 @app.route("/")
 def index():
