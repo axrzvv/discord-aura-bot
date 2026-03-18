@@ -36,7 +36,6 @@ def index():
     )
 
     return f'<a href="{oauth_url}">認証する</a>'
-    return f'<a href="{oauth_url}">認証する</a>'
 
 @app.route("/callback")
 def callback():
