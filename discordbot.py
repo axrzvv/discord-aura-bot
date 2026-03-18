@@ -23,56 +23,64 @@ import urllib.parse
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    redirect_encoded = urllib.parse.quote(REDIRECT_URI, safe='')
+@app.route('/')
+def home():
+    return '<a href="/login">認証する</a>'
 
+# 👇 外に出す！！
+@app.route('/login')
+def login():
+    redirect_encoded = urllib.parse.quote(REDIRECT_URI, safe="")
+    
     oauth_url = (
         f"https://discord.com/oauth2/authorize"
         f"?client_id={CLIENT_ID}"
         f"&response_type=code"
         f"&redirect_uri={redirect_encoded}"
-        f"&scope=identify"
+        f"&scope=identify%20guilds.join"
     )
 
-    return f'<a href="{oauth_url}">認証する</a>'
+    return redirect(oauth_url)
 
-@app.route("/callback")
+@app.route('/callback')
 def callback():
     try:
         print("🔥 CALLBACK HIT")
-        
+
         code = request.args.get("code")
         print("CODE:", code)
 
+        data = {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": REDIRECT_URI
+        }
+
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+
+        token_res = requests.post(
+            "https://discord.com/api/oauth2/token",
+            data=data,
+            headers=headers
+        )
+
+        print("STATUS:", token_res.status_code)
+        print("BODY:", token_res.text)
+
+        # 👇 ここに入れる！！
+        token_json = token_res.json()
+        access_token = token_json.get("access_token")
+        print("ACCESS TOKEN:", access_token)
+
         return "OK"
+
     except Exception as e:
         print("ERROR:", e)
         return "ERROR"
-
-    data = {
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "grant_type": "authorization_code",
-        "code": code,
-        "redirect_uri": REDIRECT_URI
-    }
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-
-    # トークン取得
-    token_res = requests.post(
-        "https://discord.com/api/oauth2/token",
-        data=data,
-        headers=headers)
-    
-    print("STATUS:", token_res.status_code)
-    print("BODY:", token_res.text)
-
-    token_json = token_res.json()
-    access_token = token_json.get("access_token")
 
     # ユーザー情報取得
     user_res = requests.get(
