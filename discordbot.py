@@ -76,9 +76,14 @@ def callback():
     return "認証完了！Discordお戻りください"
 
 # ===== Bot起動 =====
+import threading
+
 def run_bot():
     bot.run(TOKEN)
 
 if __name__ == "__main__":
-    threading.Thread(target=run_bot).start()
+    t = threading.Thread(target=run_bot)
+    t.daemon = True
+    t.start()
+
     app.run(host="0.0.0.0", port=10000)
