@@ -22,12 +22,17 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 app = Flask(__name__)
 
 @app.route("/")
+import urllib.parse
+
+@app.route("/")
 def index():
+    redirect_encoded = urllib.parse.quote(REDIRECT_URI, safe='')
+
     oauth_url = (
         f"https://discord.com/oauth2/authorize"
         f"?client_id={CLIENT_ID}"
         f"&response_type=code"
-        f"&redirect_uri={REDIRECT_URI}"
+        f"&redirect_uri={redirect_encoded}"
         f"&scope=identify"
     )
     return f'<a href="{oauth_url}">認証する</a>'
