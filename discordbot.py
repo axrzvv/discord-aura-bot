@@ -34,7 +34,16 @@ def index():
 
 @app.route("/callback")
 def callback():
-    code = request.args.get("code")
+    try:
+        print("🔥 CALLBACK HIT")
+        
+        code = request.args.get("code")
+        print("CODE:", code)
+
+        return "OK"
+    except Exception as e:
+        print("ERROR:", e)
+        return "ERROR"
 
     data = {
         "client_id": CLIENT_ID,
