@@ -54,7 +54,7 @@ def callback():
         data=data,
         headers=headers)
     
-    print("STATUS:", token_res.status_code
+    print("STATUS:", token_res.status_code)
     print("BODY:", token_res.text)
 
     token_json = token_res.json()
