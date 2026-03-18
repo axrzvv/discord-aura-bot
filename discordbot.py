@@ -90,6 +90,12 @@ def callback():
         member = guild.get_member(user_id)
         role = discord.utils.get(guild.roles, name=ROLE_NAME)
 
+        # 🔥 ここに追加
+        print("USER:", user_json)
+        print("GUILD:", guild)
+        print("MEMBER:", member)
+        print("ROLE:", role)
+
         if member and role:
             bot.loop.create_task(member.add_roles(role))
 
