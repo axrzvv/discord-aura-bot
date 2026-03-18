@@ -21,7 +21,6 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # ===== Flask設定 =====
 app = Flask(__name__)
 
-@app.route("/")
 import urllib.parse
 
 @app.route("/")
@@ -35,6 +34,8 @@ def index():
         f"&redirect_uri={redirect_encoded}"
         f"&scope=identify"
     )
+
+    return f'<a href="{oauth_url}">認証する</a>'
     return f'<a href="{oauth_url}">認証する</a>'
 
 @app.route("/callback")
