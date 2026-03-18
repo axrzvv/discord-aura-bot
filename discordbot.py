@@ -1,0 +1,86 @@
+import discord
+from discord.ext import commands
+from flask import Flask, request, redirect
+import requests
+import threading
+
+# ===== 設定 =====
+TOKEN = os.environ.get("TOKEN")
+CLIENT_ID = 1483597829502140656
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+REDIRECT_URI = "http://localhost:5000/callback"
+GUILD_ID = 1483503974085558386  # サーバーID
+ROLE_NAME = "Member"
+
+# ===== Bot設定 =====
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+# ===== Flask設定 =====
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    oauth_url = (
+        f"https://discord.com/oauth2/authorize"
+        f"?client_id={CLIENT_ID}"
+        f"&response_type=code"
+        f"&redirect_uri={REDIRECT_URI}"
+        f"&scope=identify"
+    )
+    return f'<a href="{oauth_url}">認証する</a>'
+
+@app.route("/callback")
+def callback():
+    code = request.args.get("code")
+
+    data = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": REDIRECT_URI
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    # トークン取得
+    token_res = requests.post(
+        "https://discord.com/api/oauth2/token",
+        data=data,
+        headers=headers
+    )
+    token_json = token_res.json()
+    access_token = token_json.get("access_token")
+
+    # ユーザー情報取得
+    user_res = requests.get(
+        "https://discord.com/api/users/@me",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    user_json = user_res.json()
+    user_id = int(user_json["id"])
+
+    # ロール付与
+    guild = bot.get_guild(GUILD_ID)
+    member = guild.get_member(user_id)
+    role = discord.utils.get(guild.roles, name=ROLE_NAME)
+
+    if member and role:
+        bot.loop.create_task(member.add_roles(role))
+
+    return "認証完了！Discordお戻りください"
+
+# ===== Bot起動 =====
+def run_bot():
+    bot.run(TOKEN)
+
+def run_web():
+    app.run(port=5000)
+
+threading.Thread(target=run_web).start()
+run_bot()
