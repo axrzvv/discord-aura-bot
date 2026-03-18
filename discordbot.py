@@ -79,8 +79,6 @@ def callback():
 def run_bot():
     bot.run(TOKEN)
 
-def run_web():
-    app.run(port=5000)
-
-threading.Thread(target=run_web).start()
-run_bot()
+if __name__ == "__main__":
+    threading.Thread(target=run_bot).start()
+    app.run(host="0.0.0.0", port=10000)
